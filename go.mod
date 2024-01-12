@@ -3,7 +3,7 @@ module github.com/kubewarden/go-wasi-policy-template
 go 1.21
 
 require (
-	github.com/deckarep/golang-set/v2 v2.5.0
+	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/kubewarden/k8s-objects v1.27.0-kw4
 	github.com/kubewarden/policy-sdk-go v0.5.1
 
