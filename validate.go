@@ -189,10 +189,11 @@ func findAPIAuthService(host *capabilities.Host, namespace string) (corev1.Servi
 }
 
 func findNamespacesByCustomerID(host *capabilities.Host, customerID string) (corev1.NamespaceList, error) {
+	labelSelector := fmt.Sprintf("customer-id=%s", customerID)
 	kubeRequest := kubernetes.ListAllResourcesRequest{
 		APIVersion:    "v1",
 		Kind:          "Namespace",
-		LabelSelector: fmt.Sprintf("customer-id=%s", customerID),
+		LabelSelector: &labelSelector,
 	}
 	response, err := kubernetes.ListResources(host, kubeRequest)
 	if err != nil {
