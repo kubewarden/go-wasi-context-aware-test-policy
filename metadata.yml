@@ -1,5 +1,5 @@
 rules:
-  - apiGroups: [""]
+  - apiGroups: ["apps"]
     apiVersions: ["v1"]
     resources: ["deployments"]
     operations: ["CREATE", "UPDATE"]
