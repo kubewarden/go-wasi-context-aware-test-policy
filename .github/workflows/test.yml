@@ -23,12 +23,7 @@ jobs:
       - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version: "1.21"
-      - name: Setup BATS
-        uses: mig4/setup-bats@v1.2.0
-        with:
-          bats-version: 1.5.0
-      - name: Install kwctl
-        uses: kubewarden/github-actions/kwctl-installer@v3.1.12
+      - uses: kubewarden/github-actions/policy-gh-action-dependencies@v3.1.14
       - run: make e2e-tests
 
   golangci:
