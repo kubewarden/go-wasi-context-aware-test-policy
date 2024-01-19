@@ -33,6 +33,14 @@ jobs:
         with:
           go-version: "1.21"
 
+      # Required to have a version of kwctl that understand Wasi context aware policies
+      # To be dropped once policy-gh-action-dependencies installs the right version of
+      # kwctl
+      - name: Install kwctl
+        uses: kubewarden/github-actions/kwctl-installer@v3.1.14
+        with:
+          KWCTL_VERSION: "v1.10.0-rc2"
+
       - run: make annotated-policy.wasm
       - name: Run e2e tests
         run: |
