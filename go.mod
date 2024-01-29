@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/deckarep/golang-set/v2 v2.6.0
-	github.com/kubewarden/k8s-objects v1.27.0-kw4
+	github.com/kubewarden/k8s-objects v1.27.0-kw5
 	github.com/kubewarden/policy-sdk-go v0.6.0
 )
 
