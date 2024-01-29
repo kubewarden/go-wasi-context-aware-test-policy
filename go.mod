@@ -4,8 +4,8 @@ go 1.21
 
 require (
 	github.com/deckarep/golang-set/v2 v2.6.0
-	github.com/kubewarden/k8s-objects v1.27.0-kw4
-	github.com/kubewarden/policy-sdk-go v0.6.0
+	github.com/kubewarden/k8s-objects v1.29.0-kw1
+	github.com/kubewarden/policy-sdk-go v0.6.1
 )
 
 replace github.com/go-openapi/strfmt => github.com/kubewarden/strfmt v0.1.3
