@@ -23,13 +23,13 @@ jobs:
       - uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
         with:
           go-version: "1.21"
-      - uses: kubewarden/github-actions/policy-gh-action-dependencies@v3.1.20
+      - uses: kubewarden/github-actions/policy-gh-action-dependencies@v3.2.0
 
       # Required to have a version of kwctl that understand Wasi context aware policies
       # To be dropped once policy-gh-action-dependencies installs the right version of
       # kwctl
       - name: Install kwctl
-        uses: kubewarden/github-actions/kwctl-installer@v3.1.20
+        uses: kubewarden/github-actions/kwctl-installer@v3.2.0
         with:
           KWCTL_VERSION: "v1.10.0-rc2"
 
