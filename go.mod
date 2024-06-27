@@ -1,11 +1,13 @@
 module github.com/kubewarden/go-wasi-policy-template
 
-go 1.21
+go 1.22
+
+toolchain go1.22.4
 
 require (
 	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/kubewarden/k8s-objects v1.29.0-kw1
-	github.com/kubewarden/policy-sdk-go v0.6.1
+	github.com/kubewarden/policy-sdk-go v0.11.0
 )
 
 replace github.com/go-openapi/strfmt => github.com/kubewarden/strfmt v0.1.3

@@ -157,7 +157,7 @@ func findAPIAuthService(host *capabilities.Host, namespace string) (corev1.Servi
 		APIVersion: "v1",
 		Kind:       "Service",
 		Name:       "api-auth-service",
-		Namespace:  namespace,
+		Namespace:  &namespace,
 	}
 	serviceRaw, err := kubernetes.GetResource(host, kubeRequest)
 	if err != nil {
