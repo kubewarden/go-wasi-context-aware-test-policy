@@ -18,6 +18,12 @@ type LookupError struct {
 	Message    kubewarden.Message
 }
 
+const (
+	BadRequestError = 400
+	NotFoundError   = 404
+	InternalError   = 500
+)
+
 func (l *LookupError) Error() string {
 	return fmt.Sprintf("status %d: err %v", l.StatusCode, l.Message)
 }
@@ -29,13 +35,13 @@ func validate(input []byte) ([]byte, error) {
 	if err != nil {
 		return kubewarden.RejectRequest(
 			kubewarden.Message(fmt.Sprintf("Error deserializing validation request: %v", err)),
-			kubewarden.Code(400))
+			kubewarden.Code(BadRequestError))
 	}
 	settings, err := NewSettingsFromValidationReq(&validationRequest)
 	if err != nil {
 		return kubewarden.RejectRequest(
 			kubewarden.Message(fmt.Sprintf("Error serializing RawMessage: %v", err)),
-			kubewarden.Code(400))
+			kubewarden.Code(BadRequestError))
 	}
 
 	return validateAdmissionReview(settings, validationRequest.Request)
@@ -48,7 +54,7 @@ func validateAdmissionReview(_ Settings, request kubewardenProtocol.KubernetesAd
 	if err != nil {
 		return kubewarden.RejectRequest(
 			kubewarden.Message(fmt.Sprintf("Error deserializing request object into unstructured: %v", err)),
-			kubewarden.Code(400))
+			kubewarden.Code(BadRequestError))
 	}
 
 	labels := deployment.Metadata.Labels
@@ -68,7 +74,7 @@ func validateAdmissionReview(_ Settings, request kubewardenProtocol.KubernetesAd
 	if !found {
 		return kubewarden.RejectRequest(
 			kubewarden.Message("Label customer-id is required for API deployments"),
-			kubewarden.Code(400))
+			kubewarden.Code(BadRequestError))
 	}
 
 	host := capabilities.NewHost()
@@ -77,45 +83,45 @@ func validateAdmissionReview(_ Settings, request kubewardenProtocol.KubernetesAd
 	if err != nil {
 		return kubewarden.RejectRequest(
 			kubewarden.Message(fmt.Sprintf("cannot query Namespaces: %v", err)),
-			kubewarden.Code(500))
+			kubewarden.Code(InternalError))
 	}
 
-	if namespaceList.Items == nil || len(namespaceList.Items) == 0 {
+	if len(namespaceList.Items) == 0 {
 		return kubewarden.RejectRequest(
 			kubewarden.Message(fmt.Sprintf("Label customer-id (%s) must match namespace label", customerID)),
-			kubewarden.Code(404))
+			kubewarden.Code(NotFoundError))
 	}
 
 	if len(namespaceList.Items) > 1 {
 		return kubewarden.RejectRequest(
 			kubewarden.Message(fmt.Sprintf("Multiple namespaces found with label 'customer-id=%s'", customerID)),
-			kubewarden.Code(400))
+			kubewarden.Code(BadRequestError))
 	}
 
 	namespace := namespaceList.Items[0]
 	if deployment.Metadata.Namespace != namespace.Metadata.Name {
 		return kubewarden.RejectRequest(
 			kubewarden.Message("Deployment must be created in the matching customer namespace"),
-			kubewarden.Code(400))
+			kubewarden.Code(BadRequestError))
 	}
 
 	deploymentList, err := findDeploymentsByNamespace(&host, namespace.Metadata.Name)
 	if err != nil {
 		return kubewarden.RejectRequest(
 			kubewarden.Message(fmt.Sprintf("cannot query Deployments: %v", err)),
-			kubewarden.Code(500))
+			kubewarden.Code(InternalError))
 	}
 
 	// Check if the namespace has a database and a frontend component deployed
 	if !componentDeployed(&deploymentList, "database") {
 		return kubewarden.RejectRequest(
 			kubewarden.Message("No database component found"),
-			kubewarden.Code(404))
+			kubewarden.Code(NotFoundError))
 	}
 	if !componentDeployed(&deploymentList, "frontend") {
 		return kubewarden.RejectRequest(
 			kubewarden.Message("No frontend component found"),
-			kubewarden.Code(404))
+			kubewarden.Code(NotFoundError))
 	}
 
 	// Check if the namespace has an authentication service deployed
@@ -130,13 +136,13 @@ func validateAdmissionReview(_ Settings, request kubewardenProtocol.KubernetesAd
 	if service.Metadata.Labels != nil && service.Metadata.Labels["app.kubernetes.io/part-of"] != "api" {
 		return kubewarden.RejectRequest(
 			kubewarden.Message("No API authentication service found"),
-			kubewarden.Code(404),
+			kubewarden.Code(NotFoundError),
 		)
 	}
-	if service.Metadata.Labels == nil || len(service.Metadata.Labels) == 0 {
+	if len(service.Metadata.Labels) == 0 {
 		return kubewarden.RejectRequest(
 			kubewarden.Message("API authentication service must have labels"),
-			kubewarden.Code(404),
+			kubewarden.Code(NotFoundError),
 		)
 	}
 
@@ -163,14 +169,14 @@ func findAPIAuthService(host *capabilities.Host, namespace string) (corev1.Servi
 	if err != nil {
 		return corev1.Service{}, &LookupError{
 			Message:    kubewarden.Message(fmt.Sprintf("cannot query Service: %v", err)),
-			StatusCode: kubewarden.Code(500),
+			StatusCode: kubewarden.Code(InternalError),
 		}
 	}
 
 	if len(serviceRaw) == 0 {
 		return corev1.Service{}, &LookupError{
 			Message:    kubewarden.Message("No API authentication service found"),
-			StatusCode: kubewarden.Code(404),
+			StatusCode: kubewarden.Code(NotFoundError),
 		}
 	}
 
@@ -181,7 +187,7 @@ func findAPIAuthService(host *capabilities.Host, namespace string) (corev1.Servi
 			&LookupError{
 				Message: kubewarden.Message(
 					fmt.Sprintf("cannot unmarshall response into Service: %v", err)),
-				StatusCode: kubewarden.Code(404),
+				StatusCode: kubewarden.Code(NotFoundError),
 			}
 	}
 
@@ -189,7 +195,7 @@ func findAPIAuthService(host *capabilities.Host, namespace string) (corev1.Servi
 }
 
 func findNamespacesByCustomerID(host *capabilities.Host, customerID string) (corev1.NamespaceList, error) {
-	labelSelector := fmt.Sprintf("customer-id=%s", customerID)
+	labelSelector := "customer-id=" + customerID
 	kubeRequest := kubernetes.ListAllResourcesRequest{
 		APIVersion:    "v1",
 		Kind:          "Namespace",

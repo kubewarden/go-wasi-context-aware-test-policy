@@ -49,7 +49,7 @@ func validateCliSettings(settings *Settings) ([]byte, error) {
 
 	if forbiddenButRequired.Cardinality() > 0 {
 		return kubewarden.RejectSettings(kubewarden.Message(
-			fmt.Sprintf("The following annotations are forbidden and required at the same time: %s", forbiddenButRequired.String())))
+			"The following annotations are forbidden and required at the same time: " + forbiddenButRequired.String()))
 	}
 
 	return kubewarden.AcceptSettings()
