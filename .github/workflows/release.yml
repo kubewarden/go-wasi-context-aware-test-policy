@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Install dependencies
-        uses: kubewarden/github-actions/policy-gh-action-dependencies@v3.3.4
+        uses: kubewarden/github-actions/policy-gh-action-dependencies@v3.3.5
 
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
@@ -37,7 +37,7 @@ jobs:
       # To be dropped once policy-gh-action-dependencies installs the right version of
       # kwctl
       - name: Install kwctl
-        uses: kubewarden/github-actions/kwctl-installer@v3.3.4
+        uses: kubewarden/github-actions/kwctl-installer@v3.3.5
         with:
           KWCTL_VERSION: "v1.10.0-rc2"
 
@@ -47,7 +47,7 @@ jobs:
           make e2e-tests
 
       - name: Release
-        uses: kubewarden/github-actions/policy-release@v3.3.4
+        uses: kubewarden/github-actions/policy-release@v3.3.5
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           oci-target: ghcr.io/${{ github.repository_owner }}/tests/go-wasi-context-aware-test-policy
