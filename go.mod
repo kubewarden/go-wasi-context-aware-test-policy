@@ -2,7 +2,7 @@ module github.com/kubewarden/go-wasi-policy-template
 
 go 1.22
 
-toolchain go1.23.3
+toolchain go1.23.4
 
 require (
 	github.com/deckarep/golang-set/v2 v2.7.0
