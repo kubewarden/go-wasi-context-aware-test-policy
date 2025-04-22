@@ -1,52 +1,53 @@
-# This file contains all available configuration options
-# with their default values.
-
-# options for analysis running
+version: "2"
 run:
   tests: true
-  timeout: 10m
-
-issues:
-  exclude-rules:
-    - linters:
-        - funlen
-      # Disable 'funlen' linter for test functions.
-      # It's common for table-driven tests to be more than 60 characters long
-      source: "^func Test"
-
 linters:
-  enable-all: true
+  default: all
   disable:
     - depguard
-    - exhaustivestruct
+    - err113
     - exhaustruct
-    - gci
+    - funlen
     - gochecknoglobals
     - gochecknoinits
     - gocognit
     - godot
-    - goerr113
-    - golint
-    - gofumpt
-    - gomnd
     - gomoddirectives
-    - maligned
+    - interfacebloat
+    - lll
+    - mnd
     - nlreturn
     - paralleltest
-    - scopelint
     - testpackage
     - wrapcheck
     - wsl
-    - lll # long lines
-    # https://github.com/golangci/golangci-lint/issues/541
-    - interfacer
-    - interfacebloat
-    # TODO: enable once we can set some exceptions
-    - funlen
-    - ifshort # deprecated
-
-linters-settings:
-  cyclop:
-    max-complexity: 13
-  nestif:
-    min-complexity: 8
+  settings:
+    cyclop:
+      max-complexity: 13
+    nestif:
+      min-complexity: 8
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - funlen
+        source: ^func Test
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
